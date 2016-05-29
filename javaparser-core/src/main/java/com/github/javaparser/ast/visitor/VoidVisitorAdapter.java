@@ -47,28 +47,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.body.VariableDeclaratorId;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.AssertStmt;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.BreakStmt;
-import com.github.javaparser.ast.stmt.CatchClause;
-import com.github.javaparser.ast.stmt.ContinueStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.EmptyStmt;
-import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.LabeledStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.stmt.SwitchEntryStmt;
-import com.github.javaparser.ast.stmt.SwitchStmt;
-import com.github.javaparser.ast.stmt.SynchronizedStmt;
-import com.github.javaparser.ast.stmt.ThrowStmt;
-import com.github.javaparser.ast.stmt.TryStmt;
-import com.github.javaparser.ast.stmt.TypeDeclarationStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
 import static com.github.javaparser.ast.internal.Utils.isNullOrEmpty;
@@ -840,6 +819,32 @@ public abstract class VoidVisitorAdapter<A> implements VoidVisitor<A> {
             n.getType().accept(this, arg);
         }
     }
+
+	@Override public void visit(final TagAttrExpr n, final A arg) {
+		visitComment(n.getComment(), arg);
+		if (n.getValueExpr() != null) {
+			n.getValueExpr().accept(this, arg);
+		}
+	}
+
+	@Override public void visit(final TagOpenStmt n, final A arg) {
+		visitComment(n.getComment(), arg);
+		if (n.getName() != null) {
+			n.getName().accept(this, arg);
+		}
+		if (n.getAttributes() != null) {
+			for (TagAttrExpr attr : n.getAttributes()) {
+				attr.accept(this, arg);
+			}
+		}
+	}
+
+	@Override public void visit(final TagCloseStmt n, final A arg) {
+		visitComment(n.getComment(), arg);
+		if (n.getName() != null) {
+			n.getName().accept(this, arg);
+		}
+	}
 
     private void visitComment(final Comment n, final A arg) {
 		if (n != null) {

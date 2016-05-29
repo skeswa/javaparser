@@ -445,6 +445,21 @@ public class PositionTestVisitor extends VoidVisitorAdapter<Object> {
         super.visit(n, arg);
     }
 
+    @Override public void visit(final TagAttrExpr n, final Object arg) {
+        doTest(n);
+        super.visit(n, arg);
+    }
+
+    @Override public void visit(final TagOpenStmt n, final Object arg) {
+        doTest(n);
+        super.visit(n, arg);
+    }
+
+    @Override public void visit(final TagCloseStmt n, final Object arg) {
+        doTest(n);
+        super.visit(n, arg);
+    }
+
     void doTest(final Node node) {
         final String parsed = node.toString();
 
