@@ -56,6 +56,7 @@ Then the block comments have the following positions:
 |beginLine|beginColumn|endLine|endColumn|
 |3|1|3|82|
 |4|1|4|25|
+
 |7|5|7|30|
 |10|5|13|32|
 |17|1|17|89|

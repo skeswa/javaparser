@@ -2754,6 +2754,11 @@ Statement Statement():
 	  ret = SynchronizedStatement()
 	|
 	  ret = TryStatement()
+	|
+	  LOOKAHEAD(2)
+      ret = TagCloseStatement()
+    |
+      ret = TagOpenStatement()
   )
   { return ret; }
 }
@@ -3174,6 +3179,51 @@ TryStmt TryStatement():
   		"finally" finallyBlock = Block()
   )
   { return new TryStmt(line, column, token.endLine, token.endColumn, resources, tryBlock, catchs, finallyBlock); }
+}
+
+TagOpenStmt TagOpenStatement():
+{
+    NameExpr name;
+    TagAttrExpr attr;
+    List attrs = new LinkedList();
+    boolean selfClosing = false;
+    int beginLine;
+    int beginColumn;
+}
+{
+    "<" {beginLine=token.beginLine; beginColumn=token.beginColumn;} name=Name() (attr=TagAttributeExpression() { attrs.add(attr); })* [ "/" {selfClosing=true;} ] ">"
+    { return new TagOpenStmt(beginLine, beginColumn, token.endLine, token.endColumn, name, attrs, selfClosing); }
+}
+
+TagCloseStmt TagCloseStatement():
+{
+    NameExpr name;
+    int beginLine;
+    int beginColumn;
+}
+{
+    "<" "/" {beginLine=token.beginLine; beginColumn=token.beginColumn;} name=Name() ">"
+    { return new TagCloseStmt(beginLine, beginColumn, token.endLine, token.endColumn, name); }
+}
+
+TagAttrExpr TagAttributeExpression():
+{
+    String name;
+    TagAttrExpr ret;
+    ExpressionStmt valueExpr;
+	int beginLine;
+	int beginColumn;
+	int endLine;
+	int endColumn;
+}
+{
+  <IDENTIFIER> {name=token.image; beginLine=token.beginLine; beginColumn=token.beginColumn;} "="
+  (
+    <STRING_LITERAL> {ret = new TagAttrExpr(beginLine, beginColumn, token.endLine, token.endColumn, name, token.image);} |
+    "{" valueExpr=StatementExpression() "}" {ret = new TagAttrExpr(beginLine, beginColumn, token.endLine, token.endColumn, name, valueExpr);}
+  )
+
+  { return ret; }
 }
 
 
