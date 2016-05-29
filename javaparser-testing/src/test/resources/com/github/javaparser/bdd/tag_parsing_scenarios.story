@@ -1,4 +1,4 @@
-Scenario: A class with a Lambdas is parsed by the Java Parser
+Scenario: A class with basic JVX is parsed by the Java Parser
 
 Given a CompilationUnit
 When the following source is parsed:
@@ -36,3 +36,30 @@ Then tag in statement 5 in method 1 in class 1 is of type Beta
 Then tag in statement 5 in method 1 in class 1 is a closing tag
 Then tag in statement 6 in method 1 in class 1 is of type Alpha
 Then tag in statement 6 in method 1 in class 1 is a closing tag
+
+Scenario: A class with interleaved JVX is parsed by the Java Parser
+
+Given a CompilationUnit
+When the following source is parsed:
+package bdd.samples;
+import java.util.stream.Stream;
+public class Tags {
+
+    public static void main(String[] args) {
+        <Alpha a="a">
+            for (int i = 0; i < 10; i++) {
+                <Beta b="b">
+                    if (i % 2 == 0) {
+                        <Gamma index={i} />
+                    } else {
+                        <Delta index={i} />
+                    }
+                </Beta>
+            }
+        </Alpha>
+    }
+}
+Then tag in statement 1 in method 1 in class 1 is of type Alpha
+Then tag in statement 1 in method 1 in class 1 is an opening tag
+Then tag in statement 3 in method 1 in class 1 is of type Alpha
+Then tag in statement 3 in method 1 in class 1 is a closing tag
