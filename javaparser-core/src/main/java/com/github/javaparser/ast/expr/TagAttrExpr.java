@@ -13,7 +13,7 @@ public class TagAttrExpr extends Expression {
 
     private String valueStr;
 
-    private ExpressionStmt valueExpr;
+    private Expression valueExpr;
 
     public TagAttrExpr() {
     }
@@ -26,7 +26,7 @@ public class TagAttrExpr extends Expression {
     }
 
     public TagAttrExpr(final int beginLine, final int beginColumn, final int endLine, final int endColumn,
-                       final String name, final ExpressionStmt valueExpr) {
+                       final String name, final Expression valueExpr) {
         super(beginLine, beginColumn, endLine, endColumn);
         setName(name);
         setValueExpr(valueExpr);
@@ -62,11 +62,11 @@ public class TagAttrExpr extends Expression {
         this.valueStr = valueStr;
     }
 
-    public ExpressionStmt getValueExpr() {
+    public Expression getValueExpr() {
         return valueExpr;
     }
 
-    public void setValueExpr(ExpressionStmt valueExpr) {
+    public void setValueExpr(Expression valueExpr) {
         this.valueExpr = valueExpr;
     }
 }

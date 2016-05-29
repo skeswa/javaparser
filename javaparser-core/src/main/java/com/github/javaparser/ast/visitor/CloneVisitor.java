@@ -896,8 +896,8 @@ public class CloneVisitor implements GenericVisitor<Node, Object> {
 		if (_n.getValueStr() != null) {
 			r = new TagAttrExpr(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), _n.getName(), _n.getValueStr());
 		} else {
-			ExpressionStmt stmt = (ExpressionStmt) visit(_n.getValueExpr(), _arg);
-			r = new TagAttrExpr(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), _n.getName(), stmt);
+			Expression expr = cloneNodes(_n.getValueExpr(), _arg);
+			r = new TagAttrExpr(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), _n.getName(), expr);
 		}
 
 		r.setComment(comment);

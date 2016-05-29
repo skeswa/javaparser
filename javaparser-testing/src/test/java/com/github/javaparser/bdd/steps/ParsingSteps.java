@@ -35,22 +35,18 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.github.javaparser.ast.expr.ArrayCreationExpr;
-import com.github.javaparser.ast.expr.ConditionalExpr;
-import com.github.javaparser.ast.expr.LambdaExpr;
-import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.stmt.*;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
+import org.junit.Assert;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.javaparser.bdd.steps.SharedSteps.getMemberByTypeAndPosition;
 import static com.github.javaparser.bdd.steps.SharedSteps.getMethodByPositionAndClassPosition;
@@ -58,9 +54,7 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class ParsingSteps {
 
@@ -146,6 +140,48 @@ public class ParsingSteps {
                 FieldDeclaration.class);
         AnnotationExpr annotationUnderTest = fieldUnderTest.getAnnotations().get(annotationPosition - 1);
         assertThat(annotationUnderTest.getChildrenNodes().get(1).toString(), is(expectedValue));
+    }
+
+    @Then("tag in statement $statementPosition in method $methodPosition in class $classPosition is of type $expectedType")
+    public void thenTagInClassIsOfType(int statementPosition, int methodPosition, int classPosition, String $expectedType) {
+        Statement statement = getStatementInMethodInClass(statementPosition, methodPosition, classPosition);
+        if (statement instanceof TagOpenStmt) {
+            assertThat(((TagOpenStmt) statement).getName().getName(), is($expectedType));
+        } else if (statement instanceof TagCloseStmt) {
+            assertThat(((TagCloseStmt) statement).getName().getName(), is($expectedType));
+        } else {
+            Assert.fail("This statement was not a valid tag: " + String.valueOf(statement));
+        }
+    }
+
+    @Then("tag in statement $statementPosition in method $methodPosition in class $classPosition is an opening tag")
+    public void thenTagInClassIsAnOpeningTag(int statementPosition, int methodPosition, int classPosition) {
+        Statement statement = getStatementInMethodInClass(statementPosition, methodPosition, classPosition);
+        assertTrue(statement instanceof TagOpenStmt);
+    }
+
+    @Then("tag in statement $statementPosition in method $methodPosition in class $classPosition is a closing tag")
+    public void thenTagInClassIsAnClosingTag(int statementPosition, int methodPosition, int classPosition) {
+        Statement statement = getStatementInMethodInClass(statementPosition, methodPosition, classPosition);
+        assertTrue(statement instanceof TagCloseStmt);
+    }
+
+    @Then("tag in statement $statementPosition in method $methodPosition in class $classPosition is a self-closing tag")
+    public void thenTagInClassIsAnSelfClosingTag(int statementPosition, int methodPosition, int classPosition) {
+        Statement statement = getStatementInMethodInClass(statementPosition, methodPosition, classPosition);
+        assertTrue(statement instanceof TagOpenStmt);
+        assertTrue(((TagOpenStmt) statement).isSelfClosing());
+    }
+
+    @Then("tag in statement $statementPosition in method $methodPosition in class $classPosition has an attribute called $attrName")
+    public void thenTagInClassIsHasAttr(int statementPosition, int methodPosition, int classPosition, String attrName) {
+        Statement statement = getStatementInMethodInClass(statementPosition, methodPosition, classPosition);
+        TagOpenStmt tag = (TagOpenStmt) statement;
+        Set<String> attrNames = new HashSet<>();
+        for (TagAttrExpr attr : tag.getAttributes()) {
+            attrNames.add(attr.getName());
+        }
+        assertTrue(attrNames.contains(attrName));
     }
 
     @Then("lambda in statement $statementPosition in method $methodPosition in class $classPosition is called $expectedName")
