@@ -46,27 +46,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.body.VariableDeclaratorId;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.AssertStmt;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.BreakStmt;
-import com.github.javaparser.ast.stmt.CatchClause;
-import com.github.javaparser.ast.stmt.ContinueStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.EmptyStmt;
-import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.LabeledStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.stmt.SwitchEntryStmt;
-import com.github.javaparser.ast.stmt.SwitchStmt;
-import com.github.javaparser.ast.stmt.SynchronizedStmt;
-import com.github.javaparser.ast.stmt.ThrowStmt;
-import com.github.javaparser.ast.stmt.TryStmt;
-import com.github.javaparser.ast.stmt.TypeDeclarationStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
 import java.util.Iterator;
@@ -1195,6 +1175,25 @@ public class EqualsVisitor implements GenericVisitor<Boolean, Node> {
 		return Boolean.TRUE;
 	}
 
+	@Override
+	public Boolean visit(TagAttrExpr n1, Node arg) {
+		final TagAttrExpr n2 = (TagAttrExpr) arg;
+
+		if (!objEquals(n1.getName(), n2.getName())) {
+			return Boolean.FALSE;
+		}
+
+		if (!objEquals(n1.getValueStr(), n2.getValueStr())) {
+			return Boolean.FALSE;
+		}
+
+		if (!nodeEquals(n1.getValueExpr(), n2.getValueExpr())) {
+			return Boolean.FALSE;
+		}
+
+		return Boolean.TRUE;
+	}
+
 	@Override public Boolean visit(final ExplicitConstructorInvocationStmt n1, final Node arg) {
 		final ExplicitConstructorInvocationStmt n2 = (ExplicitConstructorInvocationStmt) arg;
 
@@ -1509,4 +1508,34 @@ public class EqualsVisitor implements GenericVisitor<Boolean, Node> {
         }
         return Boolean.TRUE;
     }
+
+	@Override
+	public Boolean visit(TagOpenStmt n1, Node arg) {
+		TagOpenStmt n2 = (TagOpenStmt) arg;
+
+		if (!objEquals(n1.getName(), n2.getName())) {
+			return Boolean.FALSE;
+		}
+
+		if (!nodesEquals(n1.getAttributes(), n2.getAttributes())) {
+			return Boolean.FALSE;
+		}
+
+		if (!objEquals(n1.isSelfClosing(), n2.isSelfClosing())) {
+			return Boolean.FALSE;
+		}
+
+		return Boolean.TRUE;
+	}
+
+	@Override
+	public Boolean visit(TagCloseStmt n1, Node arg) {
+		TagCloseStmt n2 = (TagCloseStmt) arg;
+
+		if (!objEquals(n1.getName(), n2.getName())) {
+			return Boolean.FALSE;
+		}
+
+		return Boolean.TRUE;
+	}
 }

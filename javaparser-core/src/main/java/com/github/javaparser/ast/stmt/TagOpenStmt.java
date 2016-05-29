@@ -30,15 +30,12 @@ public class TagOpenStmt extends Statement {
 
     @Override
     public <R, A> R accept(GenericVisitor<R, A> v, A arg) {
-        // TODO(skeswa): implement this
-        // return v.visit(this, arg);
-        return null;
+        return v.visit(this, arg);
     }
 
     @Override
     public <A> void accept(VoidVisitor<A> v, A arg) {
-        // TODO(skeswa): implement this
-        // v.visit(this, arg);
+        v.visit(this, arg);
     }
 
     public NameExpr getName() {

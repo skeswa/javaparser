@@ -50,28 +50,7 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.AssertStmt;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.BreakStmt;
-import com.github.javaparser.ast.stmt.CatchClause;
-import com.github.javaparser.ast.stmt.ContinueStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.EmptyStmt;
-import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.LabeledStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.stmt.SwitchEntryStmt;
-import com.github.javaparser.ast.stmt.SwitchStmt;
-import com.github.javaparser.ast.stmt.SynchronizedStmt;
-import com.github.javaparser.ast.stmt.ThrowStmt;
-import com.github.javaparser.ast.stmt.TryStmt;
-import com.github.javaparser.ast.stmt.TypeDeclarationStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 
 import java.util.Iterator;
@@ -1561,6 +1540,21 @@ public class DumpVisitor implements VoidVisitor<Object> {
 		n.getValue().accept(this, arg);
 	}
 
+	@Override
+	public void visit(TagAttrExpr n, Object arg) {
+		printJavaComment(n.getComment(), arg);
+		printer.print(n.getName());
+		printer.print("=");
+
+		if (n.getValueStr() != null) {
+			printer.print(n.getValueStr());
+		} else {
+			printer.print("{");
+			n.getValueExpr().accept(this, arg);
+			printer.print("}");
+		}
+	}
+
 	@Override public void visit(final LineComment n, final Object arg) {
 		if (!this.printComments) {
             return;
@@ -1652,7 +1646,33 @@ public class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    private void printOrphanCommentsBeforeThisChildNode(final Node node){
+	@Override
+	public void visit(TagOpenStmt n, Object arg) {
+		printJavaComment(n.getComment(), arg);
+		printer.print("<");
+		n.getName().accept(this, arg);
+
+		for (TagAttrExpr attr : n.getAttributes()) {
+			printer.print(" ");
+			attr.accept(this, arg);
+		}
+
+		if (n.isSelfClosing()) {
+			printer.print(" />");
+		} else {
+			printer.print(">");
+		}
+	}
+
+	@Override
+	public void visit(TagCloseStmt n, Object arg) {
+		printJavaComment(n.getComment(), arg);
+		printer.print("</");
+		n.getName().accept(this, arg);
+		printer.print(">");
+	}
+
+	private void printOrphanCommentsBeforeThisChildNode(final Node node){
         if (node instanceof Comment) return;
 
         Node parent = node.getParentNode();

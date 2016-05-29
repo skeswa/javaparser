@@ -889,6 +889,22 @@ public class CloneVisitor implements GenericVisitor<Node, Object> {
 	}
 
 	@Override
+	public Node visit(TagAttrExpr _n, Object _arg) {
+		Comment comment = cloneNodes(_n.getComment(), _arg);
+
+		TagAttrExpr r;
+		if (_n.getValueStr() != null) {
+			r = new TagAttrExpr(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), _n.getName(), _n.getValueStr());
+		} else {
+			ExpressionStmt stmt = (ExpressionStmt) visit(_n.getValueExpr(), _arg);
+			r = new TagAttrExpr(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), _n.getName(), stmt);
+		}
+
+		r.setComment(comment);
+		return r;
+	}
+
+	@Override
 	public Node visit(ExplicitConstructorInvocationStmt _n, Object _arg) {
 		List<Type> typeArgs = visit(_n.getTypeArgs(), _arg);
 		Expression expr = cloneNodes(_n.getExpr(), _arg);
@@ -1211,7 +1227,30 @@ public class CloneVisitor implements GenericVisitor<Node, Object> {
 		return r;
 	}
 
-    public <T extends Node> List<T> visit(List<T> _nodes, Object _arg) {
+	@Override
+	public Node visit(TagOpenStmt _n, Object _arg) {
+		NameExpr name = cloneNodes(_n.getName(), _arg);
+		Comment comment = cloneNodes(_n.getComment(), _arg);
+		List<TagAttrExpr> attributes = visit(_n.getAttributes(), _arg);
+
+		TagOpenStmt r = new TagOpenStmt(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), name, attributes, _n.isSelfClosing());
+		r.setComment(comment);
+
+		return r;
+	}
+
+	@Override
+	public Node visit(TagCloseStmt _n, Object _arg) {
+		NameExpr name = cloneNodes(_n.getName(), _arg);
+		Comment comment = cloneNodes(_n.getComment(), _arg);
+
+		TagCloseStmt r = new TagCloseStmt(_n.getBeginLine(), _n.getBeginColumn(), _n.getEndLine(), _n.getEndColumn(), name);
+		r.setComment(comment);
+
+		return r;
+	}
+
+	public <T extends Node> List<T> visit(List<T> _nodes, Object _arg) {
         if (_nodes == null)
             return null;
         List<T> r = new ArrayList<T>(_nodes.size());
